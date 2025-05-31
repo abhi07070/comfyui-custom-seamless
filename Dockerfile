@@ -29,37 +29,6 @@ RUN echo "=== DEBUGGING SEAMLESS TILE INSTALLATION ===" && \
     grep -r "NODE_CLASS_MAPPINGS" /ComfyUI/custom_nodes/ComfyUI-seamless-tiling/ || echo "No NODE_CLASS_MAPPINGS found"
 
 # Test if ComfyUI can see the nodes
-RUN cd /ComfyUI && python -c "
-import sys
-import os
-sys.path.append('/ComfyUI')
-sys.path.append('/ComfyUI/custom_nodes/ComfyUI-seamless-tiling')
-
-print('Testing ComfyUI node discovery...')
-
-# Check if the main files exist
-seamless_path = '/ComfyUI/custom_nodes/ComfyUI-seamless-tiling'
-if os.path.exists(seamless_path):
-    files = os.listdir(seamless_path)
-    print(f'Files in seamless-tiling: {files}')
-    
-    # Look for the main node file
-    for file in files:
-        if file.endswith('.py') and file != '__init__.py':
-            print(f'Found Python file: {file}')
-            
-            # Try to read and check for SeamlessTile class
-            try:
-                with open(os.path.join(seamless_path, file), 'r') as f:
-                    content = f.read()
-                    if 'SeamlessTile' in content:
-                        print(f'✓ SeamlessTile found in {file}')
-                    if 'NODE_CLASS_MAPPINGS' in content:
-                        print(f'✓ NODE_CLASS_MAPPINGS found in {file}')
-            except Exception as e:
-                print(f'Error reading {file}: {e}')
-else:
-    print('❌ SeamlessTile directory not found!')
-"
+RUN cd /ComfyUI && python -c "import sys, os; sys.path.append('/ComfyUI'); seamless_path = '/ComfyUI/custom_nodes/ComfyUI-seamless-tiling'; print('SeamlessTile directory exists:', os.path.exists(seamless_path)); files = os.listdir(seamless_path) if os.path.exists(seamless_path) else []; print('Python files:', [f for f in files if f.endswith('.py')])"
 
 WORKDIR /
