@@ -72,12 +72,17 @@ ENV PYTHONPATH="/comfyui:/comfyui/custom_nodes:${PYTHONPATH:-}"
 # Return to root directory
 WORKDIR /
 
+# Create symlink to ensure models are found at expected path
+RUN ln -sf /comfyui/models /workspace/ComfyUI/models
+
 # Verify installation
 RUN echo "=== FINAL VERIFICATION ===" && \
     echo "✅ SeamlessTile custom node installed at:" && \
     ls -la /comfyui/custom_nodes/ComfyUI-seamless-tiling/ && \
     echo "✅ Python files found:" && \
     find /comfyui/custom_nodes/ComfyUI-seamless-tiling/ -name "*.py" -type f && \
+    echo "✅ Model path symlink created:" && \
+    ls -la /workspace/ComfyUI/ && \
     echo "✅ Installation complete!"
 
 # DO NOT override the ENTRYPOINT - let the base image handle it
