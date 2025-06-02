@@ -14,7 +14,7 @@ RUN echo "=== Installing SeamlessTile Custom Node ===" && \
 # Install system dependencies
 RUN echo "=== Installing System Dependencies ===" && \
     apt-get update && \
-    apt-get install -y libgl1-mesa-glx libglib2.0-0 && \
+    apt-get install -y libgl1 libglib2.0-0 libglvnd0 libglx0 && \
     rm -rf /var/lib/apt/lists/*
 
 # Install Python dependencies
@@ -67,7 +67,7 @@ RUN echo "=== INSTALLATION VERIFICATION ===" && \
 
 # Set environment variables for ComfyUI
 ENV COMFYUI_CUSTOM_NODES_PATH=/comfyui/custom_nodes
-ENV PYTHONPATH="${PYTHONPATH}:/comfyui:/comfyui/custom_nodes"
+ENV PYTHONPATH="/comfyui:/comfyui/custom_nodes:${PYTHONPATH:-}"
 
 # Return to root directory
 WORKDIR /
