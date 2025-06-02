@@ -81,14 +81,7 @@ RUN echo "=== FINAL VERIFICATION ===" && \
     echo "✅ Installation complete!"
 
 # Add a startup script to ensure custom nodes are loaded
-RUN echo '#!/bin/bash
-echo "=== ComfyUI Startup ==="
-echo "Custom nodes directory:"
-ls -la /comfyui/custom_nodes/
-echo "SeamlessTile files:"
-ls -la /comfyui/custom_nodes/ComfyUI-seamless-tiling/
-echo "=== Starting ComfyUI ==="
-exec "$@"
-' > /startup.sh && chmod +x /startup.sh
+RUN printf '#!/bin/bash\necho "=== ComfyUI Startup ==="\necho "Custom nodes directory:"\nls -la /comfyui/custom_nodes/\necho "SeamlessTile files:"\nls -la /comfyui/custom_nodes/ComfyUI-seamless-tiling/\necho "=== Starting ComfyUI ==="\nexec "$@"\n' > /startup.sh && \
+    chmod +x /startup.sh
 
 ENTRYPOINT ["/startup.sh"]
