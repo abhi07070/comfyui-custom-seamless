@@ -35,6 +35,16 @@ RUN echo "=== Installing Custom Node Requirements ===" && \
         pip install --no-cache-dir torch torchvision; \
     fi
 
+# Add this debug step to see what's actually mounted
+RUN echo "=== VOLUME MOUNT DEBUG ===" && \
+    echo "Contents of root:" && \
+    ls -la / && \
+    echo "Checking for workspace:" && \
+    ls -la /workspace 2>/dev/null || echo "/workspace not found" && \
+    echo "Checking for runpod-volume:" && \
+    ls -la /runpod-volume 2>/dev/null || echo "/runpod-volume not found" && \
+    echo "=== END DEBUG ==="
+
 # Create __init__.py if it doesn't exist (some custom nodes need this)
 RUN if [ ! -f __init__.py ]; then \
         echo "Creating __init__.py..." && \
