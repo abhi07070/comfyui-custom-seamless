@@ -80,8 +80,4 @@ RUN echo "=== FINAL VERIFICATION ===" && \
     find /comfyui/custom_nodes/ComfyUI-seamless-tiling/ -name "*.py" -type f && \
     echo "✅ Installation complete!"
 
-# Add a startup script to ensure custom nodes are loaded
-RUN printf '#!/bin/bash\necho "=== ComfyUI Startup ==="\necho "Custom nodes directory:"\nls -la /comfyui/custom_nodes/\necho "SeamlessTile files:"\nls -la /comfyui/custom_nodes/ComfyUI-seamless-tiling/\necho "=== Starting ComfyUI ==="\nexec "$@"\n' > /startup.sh && \
-    chmod +x /startup.sh
-
-ENTRYPOINT ["/startup.sh"]
+# DO NOT override the ENTRYPOINT - let the base image handle it
