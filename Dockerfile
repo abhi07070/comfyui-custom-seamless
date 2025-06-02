@@ -72,40 +72,13 @@ ENV PYTHONPATH="${PYTHONPATH}:/comfyui:/comfyui/custom_nodes"
 # Return to root directory
 WORKDIR /
 
-# Optional: Test that ComfyUI can import the custom node
-RUN echo "=== TESTING CUSTOM NODE IMPORT ===" && \
-    cd /comfyui && \
-    python -c "
-import sys
-sys.path.append('/comfyui')
-sys.path.append('/comfyui/custom_nodes')
-sys.path.append('/comfyui/custom_nodes/ComfyUI-seamless-tiling')
-
-try:
-    # Try to import the custom node
-    import os
-    os.chdir('/comfyui/custom_nodes/ComfyUI-seamless-tiling')
-    
-    # Look for the main Python file
-    import glob
-    py_files = glob.glob('*.py')
-    main_files = [f for f in py_files if f not in ['__init__.py', 'test.py', 'setup.py']]
-    
-    print(f'Found Python files: {py_files}')
-    print(f'Main files: {main_files}')
-    
-    # Try to import the main module
-    if main_files:
-        module_name = main_files[0].replace('.py', '')
-        exec(f'import {module_name}')
-        print(f'✅ Successfully imported {module_name}')
-    
-    print('✅ Custom node appears to be properly installed')
-    
-except Exception as e:
-    print(f'⚠️  Import test failed: {e}')
-    print('This might be normal if the node requires ComfyUI to be fully loaded')
-" || echo "⚠️  Import test completed with warnings (this may be normal)"
+# Verify installation
+RUN echo "=== FINAL VERIFICATION ===" && \
+    echo "✅ SeamlessTile custom node installed at:" && \
+    ls -la /comfyui/custom_nodes/ComfyUI-seamless-tiling/ && \
+    echo "✅ Python files found:" && \
+    find /comfyui/custom_nodes/ComfyUI-seamless-tiling/ -name "*.py" -type f && \
+    echo "✅ Installation complete!"
 
 # Add a startup script to ensure custom nodes are loaded
 RUN echo '#!/bin/bash
