@@ -1,62 +1,24 @@
+# Use the official RunPod ComfyUI worker base
 FROM runpod/worker-comfyui:5.1.0-base
 
-# Set working directory to ComfyUI custom nodes
+# Install SeamlessTile custom node
 WORKDIR /comfyui/custom_nodes
+RUN git clone https://github.com/spinagon/ComfyUI-seamless-tiling.git
 
-# Install git if not available
-RUN apt-get update && apt-get install -y git && rm -rf /var/lib/apt/lists/*
+# Install dependencies for SeamlessTile
+RUN pip install --no-cache-dir opencv-python-headless
 
-# Clone SeamlessTile custom node
-RUN echo "=== Installing SeamlessTile Custom Node ===" && \
-    git clone https://github.com/spinagon/ComfyUI-seamless-tiling.git && \
-    echo "✅ Repository cloned successfully"
+# Create proper extra_model_paths.yaml configuration
+RUN echo "comfyui:" > /comfyui/extra_model_paths.yaml && \
+    echo "    base_path: /runpod-volume/" >> /comfyui/extra_model_paths.yaml && \
+    echo "    checkpoints: models/checkpoints/" >> /comfyui/extra_model_paths.yaml && \
+    echo "    vae: models/vae/" >> /comfyui/extra_model_paths.yaml && \
+    echo "    loras: models/loras/" >> /comfyui/extra_model_paths.yaml && \
+    echo "    embeddings: models/embeddings/" >> /comfyui/extra_model_paths.yaml && \
+    echo "    controlnet: models/controlnet/" >> /comfyui/extra_model_paths.yaml && \
+    echo "    clip: models/clip/" >> /comfyui/extra_model_paths.yaml && \
+    echo "    unet: models/unet/" >> /comfyui/extra_model_paths.yaml && \
+    echo "    clip_vision: models/clip_vision/" >> /comfyui/extra_model_paths.yaml
 
-# Install system dependencies
-RUN echo "=== Installing System Dependencies ===" && \
-    apt-get update && \
-    apt-get install -y libgl1 libglib2.0-0 libglvnd0 libglx0 && \
-    rm -rf /var/lib/apt/lists/*
-
-# Install Python dependencies
-RUN echo "=== Installing Python Dependencies ===" && \
-    pip install --no-cache-dir opencv-python-headless numpy
-
-# Install custom node requirements
-WORKDIR /comfyui/custom_nodes/ComfyUI-seamless-tiling
-RUN echo "=== Installing Custom Node Requirements ===" && \
-    echo "Current directory: $(pwd)" && \
-    echo "Files in directory:" && \
-    ls -la && \
-    if [ -f requirements.txt ]; then \
-        echo "Installing from requirements.txt..." && \
-        pip install --no-cache-dir -r requirements.txt; \
-    else \
-        echo "No requirements.txt found, installing common dependencies..."; \
-        pip install --no-cache-dir torch torchvision; \
-    fi
-
-# Create __init__.py if it doesn't exist
-RUN if [ ! -f __init__.py ]; then \
-        echo "Creating __init__.py..." && \
-        touch __init__.py; \
-    fi
-
-# Set proper permissions
-RUN chmod -R 755 /comfyui/custom_nodes/ComfyUI-seamless-tiling
-
-# Set environment variables for ComfyUI
-ENV COMFYUI_CUSTOM_NODES_PATH=/comfyui/custom_nodes
-ENV PYTHONPATH="/comfyui:/comfyui/custom_nodes:${PYTHONPATH:-}"
-
-# Return to root directory
+# Set proper working directory
 WORKDIR /
-
-# Verify installation (NO SYMLINK!)
-RUN echo "=== FINAL VERIFICATION ===" && \
-    echo "✅ SeamlessTile custom node installed at:" && \
-    ls -la /comfyui/custom_nodes/ComfyUI-seamless-tiling/ && \
-    echo "✅ Python files found:" && \
-    find /comfyui/custom_nodes/ComfyUI-seamless-tiling/ -name "*.py" -type f && \
-    echo "✅ Models directory available at:" && \
-    ls -la /comfyui/models/ && \
-    echo "✅ Installation complete!"
