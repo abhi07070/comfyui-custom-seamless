@@ -35,17 +35,7 @@ RUN echo "=== Installing Custom Node Requirements ===" && \
         pip install --no-cache-dir torch torchvision; \
     fi
 
-# Add this debug step to see what's actually mounted
-RUN echo "=== VOLUME MOUNT DEBUG ===" && \
-    echo "Contents of root:" && \
-    ls -la / && \
-    echo "Checking for workspace:" && \
-    ls -la /workspace 2>/dev/null || echo "/workspace not found" && \
-    echo "Checking for runpod-volume:" && \
-    ls -la /runpod-volume 2>/dev/null || echo "/runpod-volume not found" && \
-    echo "=== END DEBUG ==="
-
-# Create __init__.py if it doesn't exist (some custom nodes need this)
+# Create __init__.py if it doesn't exist
 RUN if [ ! -f __init__.py ]; then \
         echo "Creating __init__.py..." && \
         touch __init__.py; \
@@ -54,27 +44,6 @@ RUN if [ ! -f __init__.py ]; then \
 # Set proper permissions
 RUN chmod -R 755 /comfyui/custom_nodes/ComfyUI-seamless-tiling
 
-# Comprehensive verification
-RUN echo "=== INSTALLATION VERIFICATION ===" && \
-    echo "ComfyUI directory structure:" && \
-    ls -la /comfyui/ && \
-    echo "" && \
-    echo "Custom nodes directory:" && \
-    ls -la /comfyui/custom_nodes/ && \
-    echo "" && \
-    echo "SeamlessTile directory contents:" && \
-    ls -la /comfyui/custom_nodes/ComfyUI-seamless-tiling/ && \
-    echo "" && \
-    echo "Python files in SeamlessTile:" && \
-    find /comfyui/custom_nodes/ComfyUI-seamless-tiling/ -name "*.py" -type f && \
-    echo "" && \
-    echo "Checking for NODE_CLASS_MAPPINGS:" && \
-    find /comfyui/custom_nodes/ComfyUI-seamless-tiling/ -name "*.py" -type f -exec grep -l "NODE_CLASS_MAPPINGS\|class.*Node" {} \; && \
-    echo "" && \
-    echo "Checking Python syntax of main files:" && \
-    find /comfyui/custom_nodes/ComfyUI-seamless-tiling/ -name "*.py" -type f -exec python -m py_compile {} \; && \
-    echo "✅ All Python files compile successfully" || echo "❌ Python compilation errors found"
-
 # Set environment variables for ComfyUI
 ENV COMFYUI_CUSTOM_NODES_PATH=/comfyui/custom_nodes
 ENV PYTHONPATH="/comfyui:/comfyui/custom_nodes:${PYTHONPATH:-}"
@@ -82,17 +51,12 @@ ENV PYTHONPATH="/comfyui:/comfyui/custom_nodes:${PYTHONPATH:-}"
 # Return to root directory
 WORKDIR /
 
-# Create symlink to ensure models are found at expected path
-RUN ln -sf /comfyui/models /workspace/ComfyUI/models
-
-# Verify installation
+# Verify installation (NO SYMLINK!)
 RUN echo "=== FINAL VERIFICATION ===" && \
     echo "✅ SeamlessTile custom node installed at:" && \
     ls -la /comfyui/custom_nodes/ComfyUI-seamless-tiling/ && \
     echo "✅ Python files found:" && \
     find /comfyui/custom_nodes/ComfyUI-seamless-tiling/ -name "*.py" -type f && \
-    echo "✅ Model path symlink created:" && \
-    ls -la /workspace/ComfyUI/ && \
+    echo "✅ Models directory available at:" && \
+    ls -la /comfyui/models/ && \
     echo "✅ Installation complete!"
-
-# DO NOT override the ENTRYPOINT - let the base image handle it
