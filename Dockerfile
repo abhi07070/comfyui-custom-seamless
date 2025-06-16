@@ -14,4 +14,7 @@ RUN echo "comfyui:" > /comfyui/extra_model_paths.yaml && \
     echo "    loras: models/loras/" >> /comfyui/extra_model_paths.yaml && \
     echo "    vae: models/vae/" >> /comfyui/extra_model_paths.yaml
 
+# Debug: verify the file was created
+RUN cat /comfyui/extra_model_paths.yaml
+
 WORKDIR /
