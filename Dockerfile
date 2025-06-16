@@ -21,7 +21,3 @@ RUN echo "comfyui:" > /comfyui/extra_model_paths.yaml && \
 
 # Set proper working directory
 WORKDIR /
-
-# Download required checkpoint model
-RUN wget -O /comfyui/models/checkpoints/realisticVisionV60B1_v51HyperVAE.safetensors \
-    "https://huggingface.co/SG161222/Realistic_Vision_V6.0_B1_noVAE/resolve/main/Realistic_Vision_V6.0_NV_B1_fp16.safetensors"
