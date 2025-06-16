@@ -16,9 +16,12 @@ RUN echo "comfyui:" > /comfyui/extra_model_paths.yaml && \
     echo "    loras: models/loras/" >> /comfyui/extra_model_paths.yaml && \
     echo "    embeddings: models/embeddings/" >> /comfyui/extra_model_paths.yaml && \
     echo "    controlnet: models/controlnet/" >> /comfyui/extra_model_paths.yaml && \
-    echo "    clip: models/clip/" >> /comfyui/extra_model_paths.yaml && \
     echo "    unet: models/unet/" >> /comfyui/extra_model_paths.yaml && \
     echo "    clip_vision: models/clip_vision/" >> /comfyui/extra_model_paths.yaml
 
 # Set proper working directory
 WORKDIR /
+
+# Download required checkpoint model
+RUN wget -O /comfyui/models/checkpoints/realisticVisionV60B1_v51HyperVAE.safetensors \
+    "https://huggingface.co/SG161222/Realistic_Vision_V6.0_B1_noVAE/resolve/main/realisticVisionV60B1_v51HyperVAE.safetensors"
